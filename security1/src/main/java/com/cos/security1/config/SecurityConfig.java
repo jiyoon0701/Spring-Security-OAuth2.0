@@ -28,6 +28,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll() // 위에 3개 주소가 아니면 모든 권한은 허용
                 .and() //권한이 없는 사용자가 들어올 시 로그인 페이지로 이동
                 .formLogin()
-                .loginPage("/loginForm");
+                .loginPage("/loginForm")
+                .loginProcessingUrl("/login") // login주소가 호출이 되면 시큐리티가 낚아채서 대신 로그인을 진행해준다.
+                .defaultSuccessUrl("/");
     }
 }
