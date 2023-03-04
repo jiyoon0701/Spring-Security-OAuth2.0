@@ -28,7 +28,14 @@ spring:
         registration:
           google: # /oauth2/authorization/google 이 주소를 동작하게 한다.
             client-id:
-            client-secret: 
+            client-secret:
             scope:
               - email
               - profile
+
+          facebook: # /oauth2/authorization/google 이 주소를 동작하게 한다.
+            client-id:
+            client-secret:
+            scope:
+              - email
+              - public_profile
