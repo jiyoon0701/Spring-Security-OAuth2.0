@@ -1,7 +1,9 @@
 package com.cos.security1.config.oauth;
 
 import com.cos.security1.config.auth.PrincipalDetails;
+import com.cos.security1.config.oauth.provider.FacebookUserInfo;
 import com.cos.security1.config.oauth.provider.GoogleUserInfo;
+import com.cos.security1.config.oauth.provider.NaverUserInfo;
 import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
@@ -12,6 +14,8 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
@@ -42,9 +46,13 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
         if(userRequest.getClientRegistration().getRegistrationId().equals("google")){
             oAuth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
         }else if((userRequest.getClientRegistration().getRegistrationId().equals("facebook"))){
-            oAuth2UserInfo = new GoogleUserInfo(oauth2User.getAttributes());
-        }else {
-            System.out.println("우리는 구글과 페이스북만 지원해요");
+            oAuth2UserInfo = new FacebookUserInfo(oauth2User.getAttributes());
+        }else if ((userRequest.getClientRegistration().getRegistrationId().equals("naver"))){
+            oAuth2UserInfo = new NaverUserInfo((Map)oauth2User.getAttributes().get("response"));
+            System.out.println("naver:" + oAuth2UserInfo);
+        }
+        else {
+            System.out.println("우리는 구글과 페이스북, 네이버만 지원해요");
         }
 
 //        String provider = userRequest.getClientRegistration().getRegistrationId(); // google
