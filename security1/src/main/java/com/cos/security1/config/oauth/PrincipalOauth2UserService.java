@@ -7,6 +7,8 @@ import com.cos.security1.config.oauth.provider.NaverUserInfo;
 import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,6 +21,9 @@ import java.util.Map;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
+    // DefaultOauth2UserService는 OAuth2 로그인 시 loadUserByUsername메서드로 로그인한 유저가 DB에 저장되어 있는지 찾는다.
+    // OAuth2로 로그인한 사용자는 회원가입을 거치지 않기 때문에 DB에 유저가 없다면 회원가입 처리
+    // 있다면 Authentication를 반환하여 SecurityContextHolder에 저장할 수 있게 한다. ??
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -29,17 +34,27 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
     // 함수 종료시 @AuthenticationPrincipal 어노테이션이 만들어진다.
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException { // 후 처리 진행
-        System.out.println("getClientRegistration:" +userRequest.getClientRegistration());
+       // System.out.println("getClientRegistration:" +userRequest.getClientRegistration());
         // 코드가 아닌 액세스 토큰와 사용자 프로필 정보를 한번에 불러온다.
         // registrationID로 어떤 OAuth로 로그인을 구별
 
-        System.out.println("getAccessToken:" +userRequest.getAccessToken());
-        System.out.println("getAttributes:" +super.loadUser(userRequest).getAttributes());
+//        System.out.println("getAccessToken:" +userRequest.getAccessToken());
+//        System.out.println("getAttributes:" +super.loadUser(userRequest).getAttributes());
 
         OAuth2User oauth2User = super.loadUser(userRequest);
         // 구글로그인 버튼 -> 구글 로그인 창 -> 로그인 완료 -> CODE 리턴 (OAuth-Client라이브러리) -. AccessToken 요청
         // userRequest 정보 -> loadUser함수 호출-> 구글로부터 회원 프로필 받아준다
-        System.out.println("getAttributes:" + oauth2User.getAttributes());
+     //   System.out.println("getAttributes:" + oauth2User.getAttributes());
+
+//        try {
+//            System.out.println("---------------------------------------------------");
+//            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(userRequest));
+//            System.out.println(new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(oauth2User));
+//            System.out.println("---------------------------------------------------");
+//        } catch (JsonProcessingException e) {
+//            throw new RuntimeException(e);
+//        }
+
 
         // 회원가입을 강제로 진행
         OAuth2UserInfo oAuth2UserInfo = null;

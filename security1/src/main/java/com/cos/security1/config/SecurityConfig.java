@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         TIP : 구글 로그인이 완료되면 코드 X, 엑세스 토큰 + 사용자 프로필 정보를 한번에 받는다.
 
         */
-                .userInfoEndpoint()
-                .userService(principalOauth2UserService); // 후 처리
+                .userInfoEndpoint() // 로그인 성공 후 사용자 정보를 가져온다.
+                .userService(principalOauth2UserService); // 후 처리  (사용자 정보를 처리할 때 사용)
     }
 }

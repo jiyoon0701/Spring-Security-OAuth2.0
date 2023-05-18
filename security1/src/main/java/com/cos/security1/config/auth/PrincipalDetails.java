@@ -20,7 +20,7 @@ import java.util.Map;
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
     private User user; // 콤포지션
-    private Map<String, Object> attributes;
+    private Map<String, Object> attributes; // 플랫폼을 통해 받은 정보들을 담는 Map
 
     // 일반 로그인
     public PrincipalDetails(User user){
@@ -28,6 +28,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
     }
 
     // OAuth 로그인
+    // 로그인을 통해 받은 정보들을 그대로 담아서 return
     public PrincipalDetails(User user, Map<String, Object> attributes){ // 생성자 오버로딩
         this.user = user;
         this.attributes = attributes;
