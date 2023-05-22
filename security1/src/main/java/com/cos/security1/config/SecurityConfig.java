@@ -14,6 +14,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 @EnableWebSecurity // 활성화 -> 스프링 시큐리티 필터(현재 파일)가 스프링 필터체인(기본 필터체인)에 등록된다
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true) // secured 어노테이션 활성화, prePostEnabled는 preAuthorize, postAuthorize 어노테이션을 활성화
+/* Security
+*  시큐리티는 기본적으로 여러 개의 filter chain들이 등록되어있고, 그 체인들을 거치면서 인증하는 프레임워크이다.
+*  WebSecurityConfigurerAdapter는 security filter chain을 사용하기 위한 설정들을 설정하는 클래스이다.
+* */
+
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired

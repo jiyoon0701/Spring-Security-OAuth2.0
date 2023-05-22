@@ -1,0 +1,58 @@
+- 요청시 처리 흐름
+OAuth2 관련 필터가 처음으로 적용되는 것이 OAuth2AuthorizationRequestRedirectFilter 이다.
+public static final String DEFAULT_AUTHORIZATION_REQUEST_BASE_URI = "/oauth2/authorization";
+"/oauth2/authorization" 으로 들어오는 요청에 대해 이 필터가 작동한다.
+
+doFilterInternal() 메소드가 동작한다.
+this.authorizationRequestResolver는 OAuth2AuthorizationRequestResolver 객체이며,
+이때 실행되는 OAuth2AuthorizationRequestResolver는 DefaultOAuth2AuthorizationRequestResolver이다.
+
+DefaultOAuth2AuthorizationRequestResolver 생성자를 보면,
+authorizationRequestBaseUri는 OAuth2AuthorizationRequestRedirectFilter의
+DEFAULT_AUTHORIZATION_REQUEST_BASE_URI (=/oauth2/authorization)를 받아오며,
+이를 사용해 authorizationRequestMatcher를 세팅한다.
+(authorizationRequestMatcher = /oauth2/authorization/{registrationId})
+
+ClientRegistrationRepository는 최조 애플리케이션 실행 시 properties or yml파일에 존재하는
+oauth2의 설정을 통해 registrationId를 ClientRegistrationRepository에 저장시켜놓고 그걸 주입
+
+- 실제 요청시 흐름
+/oauth2/authorization/google 로 요청을 보냄.
+OAuth2AuthorizationRequestRedirectFilter가 작동하여 DefaultOAuth2AuthorizationRequestResolver의 resolve를 호출
+OAuth2AuthorizationRequest authorizationRequest = this.authorizationRequestResolver.resolve(request);
+(DefaultOAuth2AuthorizationRequestResolver.resolve())
+
+String registrationId = this.resolveRegistrationId(request);
+resolveRegistrationId()는 this.authorizationRequestMatcher의 matches를 호출한다.
+위에서 보면 authorizationRequestMatcher에는 /oauth2/authorization/google가 들어있고, 조건문을 통해
+registrationId만 추출하고 반환하며, resolve의 반환값은 this.resolve(request, registrationId, redirectUriAction);이다.
+
+this.resolve 코드를 보면
+clientRegistrationRepository에는 properties파일 혹은 yml 파일에서 설정한 registation정보가 들어있다.
+이때 위에서 추출한 registrationId를 통해 등록된 registrationId이 있다면 로직을 수행 아니면 예외 발생을 시킨다.
+로직이 수행되고 나서 OAuth2AuthorizationRequestRedirectFilter를 통과하면 OAuth2LoginAuthenticationProvider의
+authenticate() 메소드가 실행된다.
+
+authenticate에서는 userService.loadUser()가 실행된다.
+이때, userService는 DefaultOAuth2UserService이다.
+loadUser의 중간과정은 복잡하니 return되는 값만 확인해보면 DefaultOAuth2User가 리턴되는 것을 알 수 있다.
+DefaultOAuth2User는 authorities는 권한, attribute는 로그인 API에서 반환하는 값(JSON)을 담고있는 값,
+nameAttributeKey는 OAuth2 로그인 진행 시 키가 되는 필드값(Primary Key와 같은 의미)
+
+SecurityContextHolder에 Authentication 저장
+계속 로그인을 진행하다보면 AbstractAuthenticationProcessingFilter에 도달하는데,
+만약 로그인이 성공했다면 successfulAuthentication이 작동한다.
+
+흐름 정리
+Http 요청 [/oauth2/authorization/{아무거나}]
+OAuth2AuthorizationRequestRedirectFilter 작동
+DefaultOAuth2AuthorizationRequestResolver 작동 registrationId 받아옴
+Application.properties에 등록된 registrationId 로 보내진 요청이라면
+OAuth2LoginAuthenticationProvider의 authenticate() 실행
+userService(DefaultOAuth2UserService)의 loadUser() 실행
+DefaultOAuth2User 리턴
+AbstractAuthenticationProcessingFilter에 도달
+AbstractAuthenticationProcessingFilter.successfulAuthentication() 작동
+SecurityContextHolder 속에 Authentication 저장
+successHandler.onAuthenticationSuccess() 호출
+
