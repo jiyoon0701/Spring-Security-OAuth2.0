@@ -23,8 +23,8 @@ public class IndexController {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+ //   @Autowired
+   // private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @GetMapping("/test/login") // UserDetails -> PrincipalDetails도 가능
     public @ResponseBody String testLogin(Authentication authentication, @AuthenticationPrincipal PrincipalDetails userDetails) { // DI(의존성 주입)
@@ -73,6 +73,12 @@ public class IndexController {
         return "manager";
     }
 
+    @GetMapping("/login")
+    public String lo() {
+        return "login";
+    }
+
+
     // 스프링시큐리티 해당주소를 낚아채버린다! -> SecurityConfig파일 생성 후 작동안함.
     @GetMapping("/loginForm")
     public String login() {
@@ -88,9 +94,9 @@ public class IndexController {
     public String join(User user) {
         user.setRole("ROLE_USER");
         String rawPassword = user.getPassword();
-        String encPassword = bCryptPasswordEncoder.encode(rawPassword);
-        user.setPassword(encPassword);
-        userRepository.save(user); // 회원가입 잘 됨 . 비밀번호 : 1234 => 시큐리티로 로그인을 할 수 없음 -> 패스워드가 암호화가 안되었기 때문이다.
+       // String encPassword = bCryptPasswordEncoder.encode(rawPassword);
+     //  user.setPassword(encPassword);
+        //userRepository.save(user); // 회원가입 잘 됨 . 비밀번호 : 1234 => 시큐리티로 로그인을 할 수 없음 -> 패스워드가 암호화가 안되었기 때문이다.
         return "redirect:/loginForm";
     }
 
