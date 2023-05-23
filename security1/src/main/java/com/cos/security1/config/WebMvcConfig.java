@@ -18,15 +18,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .setViewName("login");
     }
 
-//    @Override
-//    public void configureViewResolvers(ViewResolverRegistry registry) {
-//        MustacheViewResolver resolver = new MustacheViewResolver();
-//
-//        resolver.setCharset("UTF-8");
-//        resolver.setContentType("text/html;charset=UTF-8"); // 내가 너한테 던지는 파일은 html이야
-//        resolver.setPrefix("classpath:/templates/");
-//        resolver.setSuffix(".html"); // .mustache여도 html로 인식
-//
-//        registry.viewResolver(resolver); // registry를 뷰리졸브로 등록
-//    }
+    @Override
+    public void configureViewResolvers(ViewResolverRegistry registry) {
+        MustacheViewResolver resolver = new MustacheViewResolver();
+
+        resolver.setCharset("UTF-8");
+        resolver.setContentType("text/html;charset=UTF-8"); // 내가 너한테 던지는 파일은 html이야
+        resolver.setPrefix("classpath:/templates/");
+        resolver.setSuffix(".html"); // .mustache여도 html로 인식
+
+        registry.viewResolver(resolver); // registry를 뷰리졸브로 등록
+    }
 }
